@@ -49,7 +49,7 @@
                 android:layout_weight="1" />
 
             <ImageView
-                android:id="@+id/iv_add_to_cart"
+                android:id="@+id/imagebtn_add_to_cart"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"

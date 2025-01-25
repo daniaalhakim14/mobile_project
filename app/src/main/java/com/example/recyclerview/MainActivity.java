@@ -2,6 +2,9 @@ package com.example.recyclerview;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private foodMenuAdapter adapter;
     private List<Menu> menuList;
     private RecyclerView rvMyCardItem; // Declare RecyclerView as a class-level field
+    ImageButton btn_add;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +39,25 @@ public class MainActivity extends AppCompatActivity {
         // Set GridLayoutManager with 2 columns
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         rvMyCardItem.setLayoutManager(gridLayoutManager);
+        btn_add = findViewById(R.id.imagebtn_add_to_cart);
+
         // Initialize the adapter with an empty list
         adapter = new foodMenuAdapter(new ArrayList<>());
         rvMyCardItem.setAdapter(adapter);
         fetchFoodMenu();
+
+
+        btn_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+            }
+        });
+
     }
+
+
 
     private void fetchFoodMenu() {
         Retrofit retrofit = new Retrofit.Builder()
