@@ -1,5 +1,7 @@
 package com.example.recyclerview;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -19,6 +23,13 @@ public class foodMenuAdapter extends RecyclerView.Adapter<foodMenuAdapter.ViewHo
         this.menuList = menuList;
     }
 
+    // Add this method to update the adapter's data
+    public void updateData(List<Menu> newMenuList) {
+        this.menuList.clear(); // Clear the old data
+        this.menuList.addAll(newMenuList); // Add the new data
+        notifyDataSetChanged(); // Notify the adapter to refresh the RecyclerView
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -27,12 +38,20 @@ public class foodMenuAdapter extends RecyclerView.Adapter<foodMenuAdapter.ViewHo
         return new ViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Menu menu = menuList.get(position);
-        holder.iv_item_image.setImageResource(menu.getFoodImage());
+
+        // Convert data to byte array and decode into a Bitmap
+        byte[] imageData = menu.getFoodImage().getImageDataAsByteArray();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+
+        // Set the Bitmap in the ImageView
+        holder.iv_item_image.setImageBitmap(bitmap);
+        // Set name and price
         holder.tv_item_name.setText(menu.getFoodName());
-        holder.tv_item_price.setText(menu.getFoodPrice());
+        holder.tv_item_price.setText(String.format("RM %.2f",menu.getFoodPrice()));
     }
 
     @Override
@@ -52,5 +71,4 @@ public class foodMenuAdapter extends RecyclerView.Adapter<foodMenuAdapter.ViewHo
         }
     }
 }
-
 

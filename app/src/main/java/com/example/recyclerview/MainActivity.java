@@ -1,50 +1,86 @@
 package com.example.recyclerview;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity {
 
     private foodMenuAdapter adapter;
     private List<Menu> menuList;
+    private RecyclerView rvMyCardItem; // Declare RecyclerView as a class-level field
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // to bind
-        RecyclerView rvMyCardItem = findViewById(R.id.rv_foodMenu);
+        // Initialize RecyclerView
+        rvMyCardItem = findViewById(R.id.rv_foodMenu);
         // Set GridLayoutManager with 2 columns
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         rvMyCardItem.setLayoutManager(gridLayoutManager);
-
-        menuList = new ArrayList<>();
-        menuList.add(new Menu(1,"nasi ayam","RM5.00",R.drawable.fire_cracker));
-        menuList.add(new Menu(2,"nasi lemak","RM5.00",R.drawable.fire_cracker));
-        menuList.add(new Menu(3,"nasi ayam","RM5.00",R.drawable.fire_cracker));
-        menuList.add(new Menu(4,"nasi lemak","RM5.00",R.drawable.fire_cracker));
-        menuList.add(new Menu(5,"nasi ayam","RM5.00",R.drawable.fire_cracker));
-        menuList.add(new Menu(6,"nasi lemak","RM5.00",R.drawable.fire_cracker));
-        menuList.add(new Menu(7,"nasi ayam","RM5.00",R.drawable.fire_cracker));
-
-
-        foodMenuAdapter adapter = new foodMenuAdapter(menuList);
+        // Initialize the adapter with an empty list
+        adapter = new foodMenuAdapter(new ArrayList<>());
         rvMyCardItem.setAdapter(adapter);
-
-
-
-
+        fetchFoodMenu();
     }
+
+    private void fetchFoodMenu() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://hushed-charming-clipper.glitch.me/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        FoodMenuApi api = retrofit.create(FoodMenuApi.class);
+
+        long startTime = System.currentTimeMillis();
+
+        Call<FoodMenuResponse> call = api.getFoodMenu();
+
+        call.enqueue(new Callback<FoodMenuResponse>() {
+            @Override
+            public void onResponse(Call<FoodMenuResponse> call, Response<FoodMenuResponse> response) {
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                Log.d("API_RESPONSE_TIME", "Elapsed time: " + elapsedTime + "ms");
+
+                if (response.isSuccessful() && response.body() != null) {
+                    // Get the foodMenu list from the response object
+                    List<Menu> menuList = response.body().getFoodMenu();
+
+                    // Update the adapter's data
+                    adapter.updateData(menuList);
+                } else {
+                    Toast.makeText(MainActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FoodMenuResponse> call, Throwable t) {
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                Log.d("API_RESPONSE_TIME", "Elapsed time: " + elapsedTime + "ms");
+
+                Log.e("API_ERROR", t.getMessage());
+                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
 }

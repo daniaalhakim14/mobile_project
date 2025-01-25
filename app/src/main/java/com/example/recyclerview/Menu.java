@@ -1,48 +1,53 @@
 package com.example.recyclerview;
 
+import java.util.List;
+
 public class Menu {
-    private int FoodId;
-    private String FoodName;
-    private String FoodPrice;
-    private int FoodImage;
+    private int foodID;
+    private String foodName;
+    private String foodDescription;
+    private double foodPrice;
+    private FoodImage foodImage;
 
-    public Menu(int foodId, String foodName, String foodPrice, int foodImage) {
-        this.FoodId = foodId;
-        this.FoodName = foodName;
-        this.FoodPrice = foodPrice;
-        this.FoodImage = foodImage;
+    public int getFoodID() {
+        return foodID;
     }
 
-
-    public int getFoodId() {
-        return FoodId;
-    }
-
-    public void setFoodId(int foodId) {
-        this.FoodId = foodId;
+    public void setFoodID(int foodID) {
+        this.foodID = foodID;
     }
 
     public String getFoodName() {
-        return FoodName;
+        return foodName;
     }
 
     public void setFoodName(String foodName) {
-        this.FoodName = foodName;
+        this.foodName = foodName;
     }
 
-    public int getFoodImage() {
-        return FoodImage;
+    public String getFoodDescription() {
+        return foodDescription;
     }
 
-    public void setFoodImage(int foodImage) {
-        this.FoodImage = foodImage;
+    public void setFoodDescription(String foodDescription) {
+        this.foodDescription = foodDescription;
     }
 
-    public String getFoodPrice() {
-        return FoodPrice;
+    public double getFoodPrice() {
+        return foodPrice;
     }
 
-    public void setFoodPrice(String foodPrice) {
-        this.FoodPrice = foodPrice;
+    public void setFoodPrice(double foodPrice) {
+        this.foodPrice = foodPrice;
+    }
+
+    public FoodImage getFoodImage() {
+        return foodImage;
+    }
+
+    public void setFoodImage(FoodImage foodImage) {
+        this.foodImage = foodImage;
     }
 }
+
+
