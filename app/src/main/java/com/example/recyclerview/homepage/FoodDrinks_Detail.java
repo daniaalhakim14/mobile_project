@@ -12,11 +12,11 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import add_toCart.CartManager;
-import add_toCart.CartItem;
+import com.example.recyclerview.add_toCart.CartManager;
+import com.example.recyclerview.add_toCart.CartItem;
 
 import com.example.recyclerview.R;
-import add_toCart.add_to_cart;
+import com.example.recyclerview.add_toCart.add_to_cart;
 
 public class FoodDrinks_Detail extends AppCompatActivity {
 

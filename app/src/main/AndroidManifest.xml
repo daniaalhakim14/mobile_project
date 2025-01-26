@@ -18,7 +18,7 @@
         tools:targetApi="31">
 
         <activity
-            android:name="add_toCart.add_to_cart"
+            android:name=".add_toCart.add_to_cart"
             android:exported="false" />
         <activity
             android:name=".homepage.FoodDrinks_Detail"

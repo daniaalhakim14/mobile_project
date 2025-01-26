@@ -3,13 +3,16 @@ package com.example.recyclerview.homepage;
 import java.util.List;
 
 public class FoodMenuResponse {
-    private List<Menu> foodMenu;
+    private List<MenuFoodModel> foodMenu;
 
-    public List<Menu> getFoodMenu() {
+
+    public List<MenuFoodModel> getFoodMenu() {
         return foodMenu;
     }
 
-    public void setFoodMenu(List<Menu> foodMenu) {
+
+
+    public void setFoodMenu(List<MenuFoodModel> foodMenu) {
         this.foodMenu = foodMenu;
     }
 }

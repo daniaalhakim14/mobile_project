@@ -1,7 +1,6 @@
 package com.example.recyclerview;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -12,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.recyclerview.homepage.FoodMenuApi;
 import com.example.recyclerview.homepage.FoodMenuResponse;
-import com.example.recyclerview.homepage.Menu;
+import com.example.recyclerview.homepage.MenuFoodModel;
 import com.example.recyclerview.homepage.foodMenuAdapter;
 
 import java.util.ArrayList;
@@ -27,8 +26,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private foodMenuAdapter adapter;
-    private List<Menu> menuList;
-    private RecyclerView rvMyCardItem; // Declare RecyclerView as a class-level field
+    private List<MenuFoodModel> menuList;
+    private RecyclerView rvMyCardItem;
     ImageButton btn_add;
 
     @Override
@@ -39,17 +38,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize RecyclerView
         rvMyCardItem = findViewById(R.id.rv_foodMenu);
-        // Set GridLayoutManager with 2 columns
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         rvMyCardItem.setLayoutManager(gridLayoutManager);
-
 
         // Initialize the adapter with an empty list
         adapter = new foodMenuAdapter(new ArrayList<>());
         rvMyCardItem.setAdapter(adapter);
+
+        // Fetch both menus
         fetchFoodMenu();
     }
-
 
     private void fetchFoodMenu() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -58,37 +56,26 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         FoodMenuApi api = retrofit.create(FoodMenuApi.class);
-
-        long startTime = System.currentTimeMillis();
-
         Call<FoodMenuResponse> call = api.getFoodMenu();
 
         call.enqueue(new Callback<FoodMenuResponse>() {
             @Override
             public void onResponse(Call<FoodMenuResponse> call, Response<FoodMenuResponse> response) {
-                long elapsedTime = System.currentTimeMillis() - startTime;
-                Log.d("API_RESPONSE_TIME", "Elapsed time: " + elapsedTime + "ms");
-
                 if (response.isSuccessful() && response.body() != null) {
-                    // Get the foodMenu list from the response object
-                    List<Menu> menuList = response.body().getFoodMenu();
-
-                    // Update the adapter's data
+                    List<MenuFoodModel> menuList = response.body().getFoodMenu();
                     adapter.updateData(menuList);
                 } else {
-                    Toast.makeText(MainActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Failed to fetch food menu", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<FoodMenuResponse> call, Throwable t) {
-                long elapsedTime = System.currentTimeMillis() - startTime;
-                Log.d("API_RESPONSE_TIME", "Elapsed time: " + elapsedTime + "ms");
-
-                Log.e("API_ERROR", t.getMessage());
                 Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+
 
 }

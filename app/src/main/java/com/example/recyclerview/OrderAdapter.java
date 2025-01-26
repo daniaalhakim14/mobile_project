@@ -10,16 +10,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.recyclerview.models.Order;
-
 import java.util.List;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
-    private final List<Order> orderList;
+    private final List<OrderModel> orderList;
     private final Context context;
 
-    public OrderAdapter(List<Order> orderList, Context context) {
+    public OrderAdapter(List<OrderModel> orderList, Context context) {
         this.orderList = orderList;
         this.context = context;
     }
@@ -33,14 +31,14 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        Order order = orderList.get(position);
+        OrderModel order = orderList.get(position);
 
         // Bind order data to the views
         holder.orderId.setText("Order ID: " + order.getOrderId());
         holder.customerId.setText("Customer ID: " + order.getCustomerId());
         holder.totalPrice.setText(String.format("Total Price: RM %.2f", order.getTotalPrice()));
         holder.status.setText("Status: " + order.getStatus());
-        holder.orderDate.setText("Date: " + order.getOrderDate());
+        holder.orderDate.setText("Date: " + order.getDate());
 
         // Show delete button for completed orders
         if ("completed".equals(order.getStatus())) {

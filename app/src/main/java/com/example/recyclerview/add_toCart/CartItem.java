@@ -1,4 +1,4 @@
-package add_toCart;
+package com.example.recyclerview.add_toCart;
 
 public class CartItem {
     private int id;

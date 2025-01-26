@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,9 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.recyclerview.OrderAdapter;
-import com.example.recyclerview.R;
-import com.example.recyclerview.models.Order;
+import com.example.recyclerview.DatabaseHelper.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,41 +22,80 @@ public class OrderHistory extends AppCompatActivity {
 
     private RecyclerView orderRecyclerView;
     private OrderAdapter orderAdapter;
-    private List<Order> orderList = new ArrayList<>();
+    private List<OrderModel> orderList = new ArrayList<>();
     private Handler handler = new Handler();
     private static final String CHANNEL_ID = "OrderStatusChannel";
+    private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_history);
 
+        // Initialize DatabaseHelper
+        dbHelper = new DatabaseHelper(this);
+
         // Initialize RecyclerView
         orderRecyclerView = findViewById(R.id.orderRecyclerView);
         orderRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Fetch orders from the database
+        fetchOrdersFromDatabase();
+
         // Initialize adapter and set it to RecyclerView
         orderAdapter = new OrderAdapter(orderList, this);
         orderRecyclerView.setAdapter(orderAdapter);
+    }
 
-        // Check if an order is passed from add_to_cart
-        Order newOrder = (Order) getIntent().getSerializableExtra("order");
-        if (newOrder != null) {
-            orderList.add(newOrder);
-            orderAdapter.notifyDataSetChanged();
+    private void fetchOrdersFromDatabase() {
+        Cursor cursor = dbHelper.getAllOrder();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int orderId = cursor.getInt(cursor.getColumnIndex("order_id"));
+                String custId = cursor.getString(cursor.getColumnIndex("cust_id"));
+                String totalPrice = cursor.getString(cursor.getColumnIndex("total_price"));
+                String status = cursor.getString(cursor.getColumnIndex("status"));
+                String quantity = cursor.getString(cursor.getColumnIndex("quantity"));
+                String date = cursor.getString(cursor.getColumnIndex("date"));
 
-            // Change status to "completed" after 7 seconds and show notification
-            changeOrderStatusAfterDelay(newOrder);
+                // Create an OrderModel object
+                OrderModel order = new OrderModel(orderId, custId, Double.parseDouble(totalPrice), status, date, quantity);
+
+                // Add the order at the beginning of the list
+                orderList.add(0, order);
+
+                // Schedule a status change for orders that are not yet completed
+                if (!"completed".equals(status)) {
+                    changeOrderStatusAfterDelay(order);
+                }
+            } while (cursor.moveToNext());
+
+            cursor.close(); // Close the cursor to avoid memory leaks
         }
     }
 
-    private void changeOrderStatusAfterDelay(Order order) {
+
+
+    private void changeOrderStatusAfterDelay(OrderModel order) {
         handler.postDelayed(() -> {
+            // Update the order status to "completed" in the local object
             order.setStatus("completed");
-            orderAdapter.notifyDataSetChanged(); // Update the UI
-            showNotification(); // Show a notification
+
+            // Notify the adapter to refresh the UI
+            orderAdapter.notifyDataSetChanged();
+
+            // Update the status in the database
+            boolean isUpdated = dbHelper.updateOrderStatus(order.getOrderId(), "completed");
+            if (!isUpdated) {
+                // Handle database update failure if necessary
+                System.err.println("Failed to update order status in the database.");
+            }
+
+            // Show a notification
+            showNotification();
         }, 7000); // 7 seconds delay
     }
+
 
     private void showNotification() {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

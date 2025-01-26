@@ -1,6 +1,6 @@
 package com.example.recyclerview.homepage;
 
-public class Menu {
+public class MenuFoodModel {
     private int foodID;
     private String foodName;
     private String foodDescription;

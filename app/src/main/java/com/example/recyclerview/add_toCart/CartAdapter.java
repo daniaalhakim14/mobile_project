@@ -1,4 +1,4 @@
-package add_toCart;
+package com.example.recyclerview.add_toCart;
 
 import android.view.LayoutInflater;
 import android.view.View;

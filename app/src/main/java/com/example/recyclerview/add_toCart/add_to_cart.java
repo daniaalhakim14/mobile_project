@@ -1,4 +1,4 @@
-package add_toCart;
+package com.example.recyclerview.add_toCart;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,9 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.recyclerview.DatabaseHelper.DatabaseHelper;
 import com.example.recyclerview.R;
-import com.example.recyclerview.models.Order;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class add_to_cart extends AppCompatActivity {
@@ -20,11 +22,15 @@ public class add_to_cart extends AppCompatActivity {
     private RecyclerView cartView;
     private TextView totalFeeTxt, taxTxt, totalTxt, emptyTxt;
     private double taxPercentage = 0.06; // Example tax percentage (6%)
+    private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_to_cart);
+
+        // Initialize DatabaseHelper
+        dbHelper = new DatabaseHelper(this);
 
         // Bind UI components
         cartView = findViewById(R.id.cartView);
@@ -53,6 +59,8 @@ public class add_to_cart extends AppCompatActivity {
         }
 
         // Checkout button logic
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentDate = sdf.format(new Date());
         TextView checkoutButton = findViewById(R.id.Checkout);
         checkoutButton.setOnClickListener(v -> {
             if (cartItems.isEmpty()) {
@@ -62,29 +70,41 @@ public class add_to_cart extends AppCompatActivity {
 
             // Calculate total item cost
             double totalFee = 0;
+            StringBuilder quantityBuilder = new StringBuilder();
+
             for (CartItem item : cartItems) {
                 totalFee += item.getPrice() * item.getQuantity();
+                quantityBuilder.append(item.getQuantity()).append("x ").append(item.getName()).append(", ");
             }
 
             // Calculate tax and total cost
             double tax = totalFee * taxPercentage;
             double totalCost = totalFee + tax;
 
-            // Create an Order object with totalCost
-            Order order = new Order(System.currentTimeMillis(), 101, totalCost, "pending", "2025-01-26");
+            // Insert the order into the database
+            boolean isInserted = dbHelper.insertOrder(
+                    "101", // Example customer ID
+                    String.format("%.2f", totalCost),
+                    "pending", // Order status
+                    quantityBuilder.toString().trim(),
+                    currentDate // Current date
+            );
+            if (isInserted) {
+                Toast.makeText(this, "Order placed successfully!", Toast.LENGTH_SHORT).show();
 
-            // Pass the order to OrderHistory via intent
-            Intent intent = new Intent(add_to_cart.this, com.example.recyclerview.OrderHistory.class);
-            intent.putExtra("order", order);
-            startActivity(intent);
+                // Pass the order to OrderHistory via intent
+                Intent intent = new Intent(add_to_cart.this, com.example.recyclerview.OrderHistory.class);
+                startActivity(intent);
 
-            // Clear the cart
-            CartManager.getInstance().clearCart();
-            cartItems.clear(); // Clear local cart items list
-            updateTotals();
-            emptyTxt.setVisibility(TextView.VISIBLE);
-            cartView.setVisibility(RecyclerView.GONE);
-            Toast.makeText(this, "Order placed successfully! Cart is now empty.", Toast.LENGTH_SHORT).show();
+                // Clear the cart
+                CartManager.getInstance().clearCart();
+                cartItems.clear(); // Clear local cart items list
+                updateTotals();
+                emptyTxt.setVisibility(TextView.VISIBLE);
+                cartView.setVisibility(RecyclerView.GONE);
+            } else {
+                Toast.makeText(this, "Failed to place the order. Please try again.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
