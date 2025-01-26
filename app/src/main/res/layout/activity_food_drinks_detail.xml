@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FoodDrinks_Detail">
+    tools:context=".homepage.FoodDrinks_Detail">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -58,14 +58,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+
             <ImageButton
-                android:id="@+id/imagebtn_add_to_cart"
+                android:id="@+id/ibtn_minus"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:adjustViewBounds="true"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/plus" />
-
+                app:srcCompat="@drawable/minimize_sign" />
 
             <TextView
                 android:id="@+id/tv_quantity"
@@ -76,18 +76,18 @@
                 android:textAlignment="center" />
 
             <ImageButton
-                android:id="@+id/ibtn_minus"
+                android:id="@+id/imagebtn_add_to_cart"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:adjustViewBounds="true"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/minimize_sign" />
+                app:srcCompat="@drawable/plus" />
 
             <Button
                 android:id="@+id/btn_addOrder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Button" />
+                android:text="Add to Cart" />
 
         </LinearLayout>
 

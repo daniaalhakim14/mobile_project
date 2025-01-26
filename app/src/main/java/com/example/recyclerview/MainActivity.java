@@ -1,10 +1,7 @@
 package com.example.recyclerview;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -12,6 +9,11 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.recyclerview.homepage.FoodMenuApi;
+import com.example.recyclerview.homepage.FoodMenuResponse;
+import com.example.recyclerview.homepage.Menu;
+import com.example.recyclerview.homepage.foodMenuAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +49,6 @@ public class MainActivity extends AppCompatActivity {
         rvMyCardItem.setAdapter(adapter);
         fetchFoodMenu();
     }
-
-
-
-
 
 
     private void fetchFoodMenu() {
@@ -92,7 +90,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
 }

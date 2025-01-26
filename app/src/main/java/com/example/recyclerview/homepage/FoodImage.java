@@ -1,4 +1,4 @@
-package com.example.recyclerview;
+package com.example.recyclerview.homepage;
 
 import java.util.List;
 

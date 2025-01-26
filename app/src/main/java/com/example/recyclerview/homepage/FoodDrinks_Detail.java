@@ -1,4 +1,4 @@
-package com.example.recyclerview;
+package com.example.recyclerview.homepage;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,11 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import add_toCart.CartManager;
+import add_toCart.CartItem;
 
+import com.example.recyclerview.R;
+import add_toCart.add_to_cart;
 
 public class FoodDrinks_Detail extends AppCompatActivity {
 
@@ -51,8 +55,8 @@ public class FoodDrinks_Detail extends AppCompatActivity {
         // Load the image using Glide
         Glide.with(this)
                 .load(imageURL)
-                .placeholder(R.drawable.ic_picture_background) // Optional placeholder
-                .error(R.drawable.ic_error_background)        // Optional error image
+                .placeholder(R.drawable.ic_picture_background)
+                .error(R.drawable.ic_error_background)
                 .into(imageView);
 
         // Increase quantity
@@ -73,20 +77,14 @@ public class FoodDrinks_Detail extends AppCompatActivity {
 
         // Add to cart and navigate back to MainActivity
         btn_addorder.setOnClickListener(v -> {
-            // Mock adding to cart
+            // Add the selected item to the cart
+            CartManager.getInstance().addItem(new CartItem(foodId, foodName, foodDescription, foodPrice, imageURL, quantity));
+
+            // Show a confirmation message
             Toast.makeText(this, foodName + " added to cart", Toast.LENGTH_SHORT).show();
 
-            // Create an Intent to go back to MainActivity
-            Intent mainActivityIntent = new Intent(FoodDrinks_Detail.this, MainActivity.class);
-
-            // Pass the selected food details and quantity back to MainActivity
-            mainActivityIntent.putExtra("foodId", foodId);
-            mainActivityIntent.putExtra("foodName", foodName);
-            mainActivityIntent.putExtra("foodPrice", foodPrice);
-            mainActivityIntent.putExtra("foodDescription", foodDescription);
-            mainActivityIntent.putExtra("quantity", quantity);
-
-            // Start MainActivity
+            // Redirect to MainActivity
+            Intent mainActivityIntent = new Intent(FoodDrinks_Detail.this, add_to_cart.class);
             startActivity(mainActivityIntent);
 
             // Close this activity

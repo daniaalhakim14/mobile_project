@@ -1,8 +1,4 @@
-package com.example.recyclerview;
-
-import com.example.recyclerview.Menu;
-
-import java.util.List;
+package com.example.recyclerview.homepage;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
