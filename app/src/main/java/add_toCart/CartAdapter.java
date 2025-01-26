@@ -57,7 +57,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             item.setQuantity(item.getQuantity() + 1);
             notifyItemChanged(position);
 
-            // Notify the activity
+            // Notify the parent activity to update totals
             if (quantityChangeListener != null) {
                 quantityChangeListener.onQuantityChanged();
             }
@@ -66,15 +66,23 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         // Decrement quantity
         holder.decrementButton.setOnClickListener(v -> {
             if (item.getQuantity() > 1) {
+                // Decrease quantity and update UI
                 item.setQuantity(item.getQuantity() - 1);
                 notifyItemChanged(position);
+            } else {
+                // Remove the item when quantity reaches 0
+                CartManager.getInstance().removeItem(item); // Remove from CartManager
+                cartItems.remove(position); // Remove from local list
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position, cartItems.size());
+            }
 
-                // Notify the activity
-                if (quantityChangeListener != null) {
-                    quantityChangeListener.onQuantityChanged();
-                }
+            // Notify the parent activity to update totals
+            if (quantityChangeListener != null) {
+                quantityChangeListener.onQuantityChanged();
             }
         });
+
     }
 
     @Override
