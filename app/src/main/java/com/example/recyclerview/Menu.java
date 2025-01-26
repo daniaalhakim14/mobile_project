@@ -7,7 +7,7 @@ public class Menu {
     private String foodName;
     private String foodDescription;
     private double foodPrice;
-    private FoodImage foodImage;
+    private String imageURL;
 
     public int getFoodID() {
         return foodID;
@@ -41,13 +41,14 @@ public class Menu {
         this.foodPrice = foodPrice;
     }
 
-    public FoodImage getFoodImage() {
-        return foodImage;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void setFoodImage(FoodImage foodImage) {
-        this.foodImage = foodImage;
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 }
+
 
 

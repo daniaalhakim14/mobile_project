@@ -44,16 +44,16 @@
                 android:textSize="14sp" />
 
             <Space
-                android:layout_width="match_parent"
+                android:layout_width="12dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/imagebtn_add_to_cart"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_add_cart" />
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/ic_add_cart" />
 
         </LinearLayout>
 

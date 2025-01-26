@@ -1,5 +1,6 @@
 package com.example.recyclerview;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -39,23 +40,16 @@ public class MainActivity extends AppCompatActivity {
         // Set GridLayoutManager with 2 columns
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         rvMyCardItem.setLayoutManager(gridLayoutManager);
-        btn_add = findViewById(R.id.imagebtn_add_to_cart);
+
 
         // Initialize the adapter with an empty list
         adapter = new foodMenuAdapter(new ArrayList<>());
         rvMyCardItem.setAdapter(adapter);
         fetchFoodMenu();
-
-
-        btn_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-            }
-        });
-
     }
+
+
+
 
 
 
