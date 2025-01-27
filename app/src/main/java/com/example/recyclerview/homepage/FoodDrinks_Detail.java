@@ -12,10 +12,9 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.example.recyclerview.add_toCart.CartManager;
-import com.example.recyclerview.add_toCart.CartItem;
-
 import com.example.recyclerview.R;
+import com.example.recyclerview.add_toCart.CartItem;
+import com.example.recyclerview.add_toCart.CartManager;
 import com.example.recyclerview.add_toCart.add_to_cart;
 
 public class FoodDrinks_Detail extends AppCompatActivity {
@@ -30,11 +29,19 @@ public class FoodDrinks_Detail extends AppCompatActivity {
 
         // Retrieve the data from the Intent
         Intent intent = getIntent();
-        int foodId = intent.getIntExtra("foodId", -1);
-        String foodName = intent.getStringExtra("foodName");
-        double foodPrice = intent.getDoubleExtra("foodPrice", 0.0);
-        String foodDescription = intent.getStringExtra("foodDescription");
+        boolean isFood = intent.getBooleanExtra("isFood", true);
+
+        int itemId = intent.getIntExtra("itemId", -1);
+        String itemName = intent.getStringExtra("itemName");
+        double itemPrice = intent.getDoubleExtra("itemPrice", 0.0);
+        String itemDescription = intent.getStringExtra("itemDescription");
         String imageURL = intent.getStringExtra("imageURL");
+
+        // Debugging: Check retrieved data
+        if (itemName == null || itemDescription == null || imageURL == null) {
+            Toast.makeText(this, "Data retrieval failed!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Bind UI elements
         TextView nameTextView = findViewById(R.id.tv_itemName);
@@ -46,26 +53,22 @@ public class FoodDrinks_Detail extends AppCompatActivity {
         TextView tv_quantity = findViewById(R.id.tv_quantity);
         Button btn_addorder = findViewById(R.id.btn_addOrder);
 
-        // Set initial data
-        nameTextView.setText(foodName);
-        priceTextView.setText(String.format("RM %.2f", foodPrice));
-        descriptionTextView.setText(foodDescription);
-        tv_quantity.setText(String.valueOf(quantity));
-
-        // Load the image using Glide
+        // Set data
+        nameTextView.setText(itemName);
+        priceTextView.setText(String.format("RM %.2f", itemPrice));
+        descriptionTextView.setText(itemDescription);
         Glide.with(this)
                 .load(imageURL)
                 .placeholder(R.drawable.ic_picture_background)
                 .error(R.drawable.ic_error_background)
                 .into(imageView);
 
-        // Increase quantity
+        // Handle quantity adjustment
         ibtn_add.setOnClickListener(v -> {
             quantity++;
             tv_quantity.setText(String.valueOf(quantity));
         });
 
-        // Decrease quantity (minimum is 1)
         ibtn_minus.setOnClickListener(v -> {
             if (quantity > 1) {
                 quantity--;
@@ -75,20 +78,19 @@ public class FoodDrinks_Detail extends AppCompatActivity {
             }
         });
 
-        // Add to cart and navigate back to MainActivity
         btn_addorder.setOnClickListener(v -> {
             // Add the selected item to the cart
-            CartManager.getInstance().addItem(new CartItem(foodId, foodName, foodDescription, foodPrice, imageURL, quantity));
+            CartManager.getInstance().addItem(new CartItem(itemId, itemName, itemDescription, itemPrice, imageURL, quantity));
 
             // Show a confirmation message
-            Toast.makeText(this, foodName + " added to cart", Toast.LENGTH_SHORT).show();
+            String itemType = isFood ? "Food" : "Drink";
+            Toast.makeText(this, itemType + " \"" + itemName + "\" added to cart", Toast.LENGTH_SHORT).show();
 
-            // Redirect to MainActivity
-            Intent mainActivityIntent = new Intent(FoodDrinks_Detail.this, add_to_cart.class);
-            startActivity(mainActivityIntent);
-
-            // Close this activity
-            finish();
+            // Navigate to add_to_cart activity
+            Intent addtocart = new Intent(FoodDrinks_Detail.this, add_to_cart.class);
+            startActivity(addtocart);
         });
+
     }
+
 }

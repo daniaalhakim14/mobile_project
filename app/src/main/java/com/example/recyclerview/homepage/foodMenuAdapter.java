@@ -15,24 +15,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.recyclerview.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class foodMenuAdapter extends RecyclerView.Adapter<foodMenuAdapter.ViewHolder> {
 
-    private List<Object> menuList; // Use Object to handle both food and drink items
+    private final List<Object> menuList = new ArrayList<>();
 
-    public foodMenuAdapter(List<Object> menuList) {
-        this.menuList = menuList;
-    }
-
-    public void updateData(List<MenuFoodModel> newMenuList) {
-        if (newMenuList != null && !newMenuList.isEmpty()) {
-            this.menuList.clear();
-            this.menuList.addAll(newMenuList);
-            notifyDataSetChanged();
-        } else {
-            Log.e("Adapter", "Received empty or null menu list");
+    public void updateData(List<MenuFoodModel> newFoodList, List<MenuDrinkModel> newDrinkList) {
+        menuList.clear();
+        if (newFoodList != null) {
+            menuList.addAll(newFoodList);
         }
+        if (newDrinkList != null) {
+            menuList.addAll(newDrinkList);
+        }
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -49,46 +47,41 @@ public class foodMenuAdapter extends RecyclerView.Adapter<foodMenuAdapter.ViewHo
 
         if (item instanceof MenuFoodModel) {
             MenuFoodModel food = (MenuFoodModel) item;
-            holder.tv_item_name.setText(food.getFoodName());
-            holder.tv_item_price.setText(String.format("RM %.2f", food.getFoodPrice()));
-
-            Glide.with(holder.itemView.getContext())
-                    .load(food.getImageURL())
-                    .placeholder(R.drawable.ic_picture_background)
-                    .error(R.drawable.ic_error_background)
-                    .into(holder.iv_item_image);
-
-            holder.imagebtn_add_to_cart.setOnClickListener(v -> {
+            bindData(holder, food.getFoodName(), food.getFoodPrice(), food.getImageURL(), v -> {
                 Intent intent = new Intent(v.getContext(), FoodDrinks_Detail.class);
-                intent.putExtra("foodId", food.getFoodID());
-                intent.putExtra("foodName", food.getFoodName());
-                intent.putExtra("foodPrice", food.getFoodPrice());
-                intent.putExtra("foodDescription", food.getFoodDescription());
+                intent.putExtra("isFood", true);
+                intent.putExtra("itemId", food.getFoodID());
+                intent.putExtra("itemName", food.getFoodName());
+                intent.putExtra("itemPrice", food.getFoodPrice());
+                intent.putExtra("itemDescription", food.getFoodDescription());
                 intent.putExtra("imageURL", food.getImageURL());
                 v.getContext().startActivity(intent);
             });
-
         } else if (item instanceof MenuDrinkModel) {
             MenuDrinkModel drink = (MenuDrinkModel) item;
-            holder.tv_item_name.setText(drink.getDrinkName());
-            holder.tv_item_price.setText(String.format("RM %.2f", drink.getDrinkPrice()));
-
-            Glide.with(holder.itemView.getContext())
-                    .load(drink.getImageURL())
-                    .placeholder(R.drawable.ic_picture_background)
-                    .error(R.drawable.ic_error_background)
-                    .into(holder.iv_item_image);
-
-            holder.imagebtn_add_to_cart.setOnClickListener(v -> {
+            bindData(holder, drink.getDrinkName(), drink.getDrinkPrice(), drink.getImageURL(), v -> {
                 Intent intent = new Intent(v.getContext(), FoodDrinks_Detail.class);
-                intent.putExtra("foodId", drink.getDrinkID());
-                intent.putExtra("foodName", drink.getDrinkName());
-                intent.putExtra("foodPrice", drink.getDrinkPrice());
-                intent.putExtra("foodDescription", drink.getDrinkDescription());
+                intent.putExtra("isFood", false);
+                intent.putExtra("itemId", drink.getDrinkID());
+                intent.putExtra("itemName", drink.getDrinkName());
+                intent.putExtra("itemPrice", drink.getDrinkPrice());
+                intent.putExtra("itemDescription", drink.getDrinkDescription());
                 intent.putExtra("imageURL", drink.getImageURL());
                 v.getContext().startActivity(intent);
             });
         }
+    }
+
+
+    private void bindData(ViewHolder holder, String name, double price, String imageURL, View.OnClickListener clickListener) {
+        holder.tv_item_name.setText(name);
+        holder.tv_item_price.setText(String.format("RM %.2f", price));
+        Glide.with(holder.itemView.getContext())
+                .load(imageURL)
+                .placeholder(R.drawable.ic_picture_background)
+                .error(R.drawable.ic_error_background)
+                .into(holder.iv_item_image);
+        holder.imagebtn_add_to_cart.setOnClickListener(clickListener);
     }
 
     @Override
@@ -110,4 +103,3 @@ public class foodMenuAdapter extends RecyclerView.Adapter<foodMenuAdapter.ViewHo
         }
     }
 }
-

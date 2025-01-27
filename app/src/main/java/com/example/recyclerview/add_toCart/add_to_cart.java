@@ -23,6 +23,7 @@ public class add_to_cart extends AppCompatActivity {
     private TextView totalFeeTxt, taxTxt, totalTxt, emptyTxt;
     private double taxPercentage = 0.06; // Example tax percentage (6%)
     private DatabaseHelper dbHelper;
+    private CartAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,24 +44,37 @@ public class add_to_cart extends AppCompatActivity {
         List<CartItem> cartItems = CartManager.getInstance().getCartItems();
 
         if (cartItems.isEmpty()) {
-            emptyTxt.setVisibility(TextView.VISIBLE);
-            cartView.setVisibility(RecyclerView.GONE);
+            showEmptyCart();
         } else {
-            emptyTxt.setVisibility(TextView.GONE);
-            cartView.setVisibility(RecyclerView.VISIBLE);
-
-            // Set up RecyclerView with CartAdapter
-            cartView.setLayoutManager(new LinearLayoutManager(this));
-            CartAdapter adapter = new CartAdapter(cartItems, this::updateTotals);
-            cartView.setAdapter(adapter);
-
-            // Calculate and display totals initially
-            updateTotals();
+            showCartWithItems(cartItems);
         }
 
         // Checkout button logic
+        setupCheckoutButton(cartItems);
+    }
+
+    private void showEmptyCart() {
+        emptyTxt.setVisibility(View.VISIBLE);
+        cartView.setVisibility(View.GONE);
+    }
+
+    private void showCartWithItems(List<CartItem> cartItems) {
+        emptyTxt.setVisibility(View.GONE);
+        cartView.setVisibility(View.VISIBLE);
+
+        // Set up RecyclerView with CartAdapter
+        cartView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new CartAdapter(cartItems, this::updateTotals);
+        cartView.setAdapter(adapter);
+
+        // Calculate and display totals initially
+        updateTotals();
+    }
+
+    private void setupCheckoutButton(List<CartItem> cartItems) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentDate = sdf.format(new Date());
+
         TextView checkoutButton = findViewById(R.id.Checkout);
         checkoutButton.setOnClickListener(v -> {
             if (cartItems.isEmpty()) {
@@ -68,7 +82,6 @@ public class add_to_cart extends AppCompatActivity {
                 return;
             }
 
-            // Calculate total item cost
             double totalFee = 0;
             StringBuilder quantityBuilder = new StringBuilder();
 
@@ -77,18 +90,17 @@ public class add_to_cart extends AppCompatActivity {
                 quantityBuilder.append(item.getQuantity()).append("x ").append(item.getName()).append(", ");
             }
 
-            // Calculate tax and total cost
             double tax = totalFee * taxPercentage;
             double totalCost = totalFee + tax;
 
-            // Insert the order into the database
             boolean isInserted = dbHelper.insertOrder(
                     "101", // Example customer ID
                     String.format("%.2f", totalCost),
-                    "pending", // Order status
+                    "pending",
                     quantityBuilder.toString().trim(),
-                    currentDate // Current date
+                    currentDate
             );
+
             if (isInserted) {
                 Toast.makeText(this, "Order placed successfully!", Toast.LENGTH_SHORT).show();
 
@@ -98,17 +110,15 @@ public class add_to_cart extends AppCompatActivity {
 
                 // Clear the cart
                 CartManager.getInstance().clearCart();
-                cartItems.clear(); // Clear local cart items list
-                updateTotals();
-                emptyTxt.setVisibility(TextView.VISIBLE);
-                cartView.setVisibility(RecyclerView.GONE);
+                cartItems.clear();
+                adapter.notifyDataSetChanged();
+                showEmptyCart();
             } else {
                 Toast.makeText(this, "Failed to place the order. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // Update totals dynamically
     private void updateTotals() {
         double totalFee = 0;
 
@@ -119,21 +129,17 @@ public class add_to_cart extends AppCompatActivity {
             totalFee += item.getPrice() * item.getQuantity();
         }
 
-        // Calculate tax and total cost
         double tax = totalFee * taxPercentage;
         double totalCost = totalFee + tax;
 
-        // Update UI
         totalFeeTxt.setText(String.format("RM %.2f", totalFee));
         taxTxt.setText(String.format("RM %.2f", tax));
         totalTxt.setText(String.format("RM %.2f", totalCost));
 
-        // Hide cart if it becomes empty
         if (cartItems.isEmpty()) {
-            emptyTxt.setVisibility(TextView.VISIBLE);
-            cartView.setVisibility(RecyclerView.GONE);
+            showEmptyCart();
         } else {
-            emptyTxt.setVisibility(TextView.GONE);
+            emptyTxt.setVisibility(View.GONE);
             cartView.setVisibility(View.VISIBLE);
         }
     }

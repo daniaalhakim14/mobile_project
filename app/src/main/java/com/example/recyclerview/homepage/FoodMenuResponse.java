@@ -4,17 +4,13 @@ import java.util.List;
 
 public class FoodMenuResponse {
     private List<MenuFoodModel> foodMenu;
-
+    private List<MenuDrinkModel> drinkMenu;
 
     public List<MenuFoodModel> getFoodMenu() {
         return foodMenu;
     }
 
-
-
-    public void setFoodMenu(List<MenuFoodModel> foodMenu) {
-        this.foodMenu = foodMenu;
+    public List<MenuDrinkModel> getDrinkMenu() {
+        return drinkMenu;
     }
 }
-
-

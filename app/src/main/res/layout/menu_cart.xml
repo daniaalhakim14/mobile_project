@@ -43,11 +43,6 @@
                 android:text="Price"
                 android:textSize="14sp" />
 
-            <Space
-                android:layout_width="12dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
             <ImageButton
                 android:id="@+id/imagebtn_add_to_cart"
                 android:layout_width="40dp"
