@@ -1,7 +1,11 @@
 package com.example.recyclerview;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -28,7 +32,11 @@ public class MainActivity extends AppCompatActivity {
 
     private foodMenuAdapter adapter;
     private RecyclerView rvMyCardItem;
-    private ImageButton btn_add;
+    private Spinner itemTypeSpinner;
+
+    // Lists to hold all data
+    private List<MenuFoodModel> allFoodItems = new ArrayList<>();
+    private List<MenuDrinkModel> allDrinkItems = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +49,25 @@ public class MainActivity extends AppCompatActivity {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         rvMyCardItem.setLayoutManager(gridLayoutManager);
 
+        // Initialize the Spinner
+        itemTypeSpinner = findViewById(R.id.item_type);
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.items_type,
+                android.R.layout.simple_spinner_item
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        itemTypeSpinner.setAdapter(spinnerAdapter);
+
         // Initialize the adapter with an empty list
         adapter = new foodMenuAdapter();
         rvMyCardItem.setAdapter(adapter);
 
         // Fetch both food and drink menus
         fetchMenus();
+
+        // Set up Spinner selection logic
+        setupSpinnerListener();
     }
 
     private void fetchMenus() {
@@ -62,10 +83,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<FoodMenuResponse> call, Response<FoodMenuResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<MenuFoodModel> foodMenu = response.body().getFoodMenu();
+                    allFoodItems = response.body().getFoodMenu();
 
                     // Fetch drink menu after food menu
-                    fetchDrinkMenu(foodMenu);
+                    fetchDrinkMenu();
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to fetch food menu", Toast.LENGTH_SHORT).show();
                 }
@@ -78,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchDrinkMenu(List<MenuFoodModel> foodMenu) {
+    private void fetchDrinkMenu() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://hushed-charming-clipper.glitch.me/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -91,10 +112,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<FoodMenuResponse> call, Response<FoodMenuResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<MenuDrinkModel> drinkMenu = response.body().getDrinkMenu();
+                    allDrinkItems = response.body().getDrinkMenu();
 
-                    // Update adapter with both food and drink menus
-                    adapter.updateData(foodMenu, drinkMenu);
+                    // Initially display all items
+                    adapter.updateData(allFoodItems, allDrinkItems);
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to fetch drink menu", Toast.LENGTH_SHORT).show();
                 }
@@ -103,6 +124,34 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<FoodMenuResponse> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupSpinnerListener() {
+        itemTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedType = parent.getItemAtPosition(position).toString();
+
+                // Filter based on the selected type
+                switch (selectedType) {
+                    case "All":
+                        adapter.updateData(allFoodItems, allDrinkItems);
+                        break;
+                    case "Food":
+                        adapter.updateData(allFoodItems, null); // Display only food
+                        break;
+                    case "Drinks":
+                        adapter.updateData(null, allDrinkItems); // Display only drinks
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Default to "All"
+                adapter.updateData(allFoodItems, allDrinkItems);
             }
         });
     }
